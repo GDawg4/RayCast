@@ -21,6 +21,24 @@ textures = {
     '4': pygame.image.load('wall4.png'),
     '5': pygame.image.load('wall5.png')
 }
+pygame.init()
+FONT = pygame.font.SysFont ("Times New Norman", 60)
+# If the text surfaces and button rects don't change,
+# you can define them once outside of the while loop.
+text1 = FONT.render("START", True, WHITE)
+text2 = FONT.render("OPTIONS", True, WHITE)
+text3 = FONT.render("ABOUT", True, WHITE)
+rect1 = pygame.Rect(300,300,205,80)
+rect2 = pygame.Rect(300,400,205,80)
+rect3 = pygame.Rect(300,500,205,80)
+# The buttons consist of a text surface, a rect and a color.
+buttons = [
+    [text1, rect1, BLACK],
+    [text2, rect2, BLACK],
+    [text3, rect3, BLACK],
+    ]
+
+HOVER_COLOR = (50, 70, 90)
 
 
 class RayCaster(object):
@@ -126,8 +144,7 @@ class RayCaster(object):
             self.screen.set_at((half_width - 1, i), BLACK)
 
 
-pygame.init()
-screen = pygame.display.set_mode((1000,500), pygame.DOUBLEBUF | pygame.HWACCEL) #, pygame.FULLSCREEN)
+screen = pygame.display.set_mode((1000, 1000), pygame.DOUBLEBUF | pygame.HWACCEL) #, pygame.FULLSCREEN)
 screen.set_alpha(None)
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 30)
@@ -138,11 +155,42 @@ def update_fps():
     fps = font.render(fps, 1, pygame.Color("white"))
     return fps
 
+isRunning = True
+intro = True
+
+font = pygame.font.SysFont ("Times New Norman, Arial", 30)
+text = font.render("START", True, WHITE)
+screen.blit(text, (340, 320))
+
+while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                isRunning = False
+                intro = False
+            elif event.type == pygame.MOUSEMOTION:
+                for button in buttons:
+                    # button[1] is the rect. Use its collidepoint method with
+                    # the `event.pos` (mouse position) to detect collisions.
+                    if button[1].collidepoint(event.pos):
+                        # Set the button's color to the hover color.
+                        button[2] = HOVER_COLOR
+                    else:
+                        # Otherwise reset the color to black.
+                        button[2] = BLACK
+
+        screen.fill((20, 50, 70))
+
+        # Draw the buttons with their current colors at their rects.
+        # You can unpack the button lists directly in the head of the loop.
+        for text, rect, color in buttons:
+            pygame.draw.rect(screen, color, rect)
+            screen.blit(text, rect)
+
+        pygame.display.flip()
+        clock.tick(15)
 
 r = RayCaster(screen)
 r.load_map('map.txt')
-
-isRunning = True
 
 while isRunning:
 
